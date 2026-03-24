@@ -24,6 +24,7 @@ export const uploadResume = (formData) =>
   api.post('/resume/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
+
 export const getResume = () => api.get('/resume');
 
 // Jobs
@@ -32,8 +33,10 @@ export const getJobs = (params = {}) => api.get('/jobs', { params });
 // Applications
 export const getApplications = () => api.get('/applications');
 export const createApplication = (data) => api.post('/applications', data);
-export const updateApplication = (id, data) => api.patch(`/applications/${id}`, data);
-export const deleteApplication = (id) => api.delete(`/applications/${id}`);
+export const updateApplication = (id, data) =>
+  api.patch(`/applications/${id}`, data);
+export const deleteApplication = (id) =>
+  api.delete(`/applications/${id}`);
 
 // Locations
 export const getNearbyLocations = (city, radius = 200) =>
@@ -44,5 +47,3 @@ export const askAssistant = (message, currentFilters) =>
   api.post('/assistant', { message, currentFilters });
 
 export default api;
-
-// redeploy fix
