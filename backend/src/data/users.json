@@ -1,0 +1,48 @@
+[
+  {
+    "id": "user-001",
+    "email": "test@gmail.com",
+    "password": "test@123",
+    "name": "Gunda Badrinadh",
+    "avatar": "AJ",
+    "resumeText": "\n\nGunda Badrinadh\n+91-9493051600 | Gundabadrinadh@gmail.com\nSuryapet, Telangana – 508213\nProfessional Summary\nAI ML-focused Computer Science student with hands-on experience in computer vision, automation, and\ndataset engineering. Passionate about building intelligent systems and scalable AI solutions. Seeking\nopportunities in AI Engineering / Software Development roles where I can contribute to real-world problem\nsolving.\nEducation\n•\nBachelor of Technology in Computer Science and Engineering (AI & ML)2022 – 2026\nAnurag Engineering College, KodadCGPA: 8.18\nPersonal Projects\n•\nGesture-Controlled PowerPoint Presentation System\nComputer vision-based system to control presentation slides using hand gestures.\n– Implemented real-time hand gesture detection to map gestures to slide navigation actions.\n– Integrated gesture recognition logic with system-level automation for presentation control.\n– Tested system responsiveness and accuracy under varying conditions.\n– Prepared functional documentation outlining gesture mapping and execution flow.\n•\nText-to-Speech Synthesizer\nWeb-based text-to-speech converter implemented using JavaScript APIs.\n– Improved accessibility by enabling audio output for on-screen text.\n– Enhanced usability for learning and content-consumption applications.\n– Technologies used: HTML, CSS, JavaScript.\n•\nAutomated File Organisation and Data Visualization\nPython-based automation system to categorize multimedia files by type.\n– Organized files into structured folders to improve data retrieval and management.\n– Applied basic machine learning logic for file classification.\n– Technologies used: Python, ML algorithms.\nExperience\n•\nAI Creators InternshipAug 2024\nAICTE – Swecha\n– Supported AI dataset development through structured collection and processing of real-world audio and video\ndata.\n– Followed defined standards to ensure data quality and consistency for speech and vision-based model training.\n– Assisted in data validation to support model accuracy.\n– Maintained documentation related to data sources and collection procedures.\nTechnical Skills\nProgramming Languages: C, Python, Java, JavaScript, HTML5, CSS3\nDevelopment Tools: VS Code, Git, GitHub\nTechnical Concepts: Data Structures & Algorithms, Object-Oriented Programming, Machine Learning, Web APIs\nLibraries & Frameworks: Python Libraries (pandas, scikit-learn, NumPy), JavaScript Libraries\nCore Competencies: Algorithm Design, Code Optimization, System Design, Problem Solving, Software\nDevelopment\nLanguages Known: English, Telugu\nActivities and Volunteering\n•\nNSS Volunteer – Conducted structured field surveys to document feedback on government scheme utilization.\n•\nBlood Donation Camp Volunteer – Assisted in coordination with a district government hospital.\n•\nAttended Workshop on Drone Technology (Nov 2024).",
+    "resumeSkills": [
+      "JavaScript",
+      "Python",
+      "Java",
+      "Go",
+      "C",
+      "Git",
+      "GitHub",
+      "scikit-learn",
+      "pandas",
+      "NumPy",
+      "Machine Learning",
+      "CSS",
+      "Accessibility",
+      "System Design"
+    ],
+    "resumeFileName": "BADRINADH_GUNDA_RESUME.pdf",
+    "resumeExtractedName": "Gunda Badrinadh"
+  },
+  {
+    "id": "user-a1353911-4489-4418-892f-0719e92e223e",
+    "name": "john",
+    "email": "johndoe@gmial.com",
+    "password": "1e0b8af599d2ca1b2fac55872152682a6ed4122b2d32d90d6e9384532d9b389d",
+    "avatar": "JO",
+    "resumeText": "\n\nCHARLES MCTURLAND\nSOFTWARE ENGINEER\nCONTACT\ncmcturland@email.com\n(123) 456-7890\nNew York, NY\nLinkedIn\nEDUCATION\nB.S.\nComputer Science\nUniversity of Pittsburgh\nSeptember 2015 - April 2019\nPittsburgh, PA\nSKILLS\nPython\nJava\nSQL\nREST API Development\nAnalytical Problem Solving\nTechnical Documentation\nAgile Development Practices\nWORK EXPERIENCE\nSoftware Engineer\nEmbark\nJanuary 2022 - current/New York, NY\nArchitected backend services supporting vehicle logistics workflows,\nenabling dispatch systems to process ~12k shipment events per day\nwith reliable status synchronization.\nOptimized route-planning queries in a microservices environment using\nPython and PostgreSQL, reducing average API response time by 38%\nduring peak operations.\nImplemented automated validation checks across shipment ingestion\npipelines, improving operational data accuracy across 5 core internal\nsystems used by dispatch teams.\nPartnered with product and operations stakeholders to ship incremental\nplatform releases on a bi-weekly cadence, accelerating delivery of new\ncarrier integration features.\nSoftware Engineer\nMarketSmart\nApril 2019 - January 2022/Washington, DC\nDeveloped new lead-scoring features for a marketing analytics platform,\nincreasing predictive model precision by 21% for donor engagement\ncampaigns.\nRefactored legacy data processing modules into modular services,\ndecreasing average batch processing time by 17 minutes per run.\nIntegrated REST APIs connecting CRM systems and campaign analytics\ntools, supporting data exchange across 3 enterprise client platforms.\nCollaborated with data science and product teams to deploy\nexperimentation pipelines that supported dozens of A/B campaign tests\nannually.\nSoftware Engineer Intern\nMarketing Science Company\nApril 2018 - March 2019/Pittsburgh, PA\nBuilt internal dashboards to visualize campaign performance metrics,\nenabling analysts to monitor 150+ active advertising experiments.\nAutomated recurring data preparation tasks in Python, reducing manual\nanalyst workload by ~6 hours per week.\nInvestigated anomalies in digital campaign reporting pipelines, resolving\ndiscrepancies affecting three client reporting workflows.\nDocumented ETL processes and onboarding guides that shortened\nramp-up time for incoming interns by one training session.",
+    "resumeSkills": [
+      "Python",
+      "Java",
+      "C",
+      "REST APIs",
+      "PostgreSQL",
+      "Git",
+      "Agile"
+    ],
+    "resumeFileName": "software-engineer-resume-example.pdf",
+    "createdAt": "2026-03-24T14:28:06.944Z",
+    "resumeExtractedName": "CHARLES MCTURLAND"
+  }
+]

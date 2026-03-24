@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+/* ── Dark mode strategy: class on <html> ── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  /* Shared brand palette */
+  :root {
+    --color-brand-50:  #eef2ff;
+    --color-brand-100: #e0e7ff;
+    --color-brand-500: #6366f1;
+    --color-brand-600: #4f46e5;
+    --color-brand-700: #4338ca;
+
+    /* Light-mode surface tokens */
+    --bg:        #f8fafc;
+    --surface:   #ffffff;
+    --surface-2: #f1f5f9;
+    --text:      #0f172a;
+    --text-muted:#64748b;
+    --border:    rgba(0,0,0,0.08);
+  }
+
+  /* Dark-mode surface tokens — applied when <html class="dark"> */
+  .dark {
+    --bg:        #111111;   /* light black / neutral */
+    --surface:   rgba(255,255,255,0.04);
+    --surface-2: rgba(255,255,255,0.02);
+    --text:      #f1f5f9;
+    --text-muted:#94a3b8;
+    --border:    rgba(255,255,255,0.08);
+  }
+
+  /* Smooth transition when toggling */
+  *, *::before, *::after {
+    transition-property: background-color, border-color, color;
+    transition-duration: 200ms;
+    transition-timing-function: ease;
+  }
+
+  html {
+    background-color: var(--bg);
+    color: var(--text);
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 10px;
+  }
+}
