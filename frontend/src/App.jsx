@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
 import { useUiStore } from './store/uiStore';
@@ -29,7 +29,7 @@ function App() {
  }, [darkMode]);
 
  return (
- <BrowserRouter>
+  <HashRouter>
  <Toaster
  position="top-right"
           toastOptions={{
@@ -71,7 +71,7 @@ function App() {
  <Route path="*" element={<Navigate to={isAuthenticated ? '/jobs' : '/login'} replace />} />
  </Routes>
  {isAuthenticated && <ChatBubble />}
- </BrowserRouter>
+ </HashRouter>
  );
 }
 
