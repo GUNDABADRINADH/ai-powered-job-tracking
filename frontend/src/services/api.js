@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: 'https://ai-powered-job-trac-king.onrender.com',
   headers: { 'Content-Type': 'application/json' },
 });
 
