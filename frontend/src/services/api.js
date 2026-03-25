@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://ai-powered-job-trac-king.onrender.com',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -14,36 +14,39 @@ api.interceptors.request.use((config) => {
 
 // Auth
 export const login = (email, password) =>
-  api.post('/auth/login', { email, password });
+  api.post('/api/auth/login', { email, password });
 
 export const register = (name, email, password) =>
-  api.post('/auth/register', { name, email, password });
+  api.post('/api/auth/register', { name, email, password });
 
 // Resume
 export const uploadResume = (formData) =>
-  api.post('/resume/upload', formData, {
+  api.post('/api/resume/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 
-export const getResume = () => api.get('/resume');
+export const getResume = () => api.get('/api/resume');
 
 // Jobs
-export const getJobs = (params = {}) => api.get('/jobs', { params });
+export const getJobs = (params = {}) => api.get('/api/jobs', { params });
 
 // Applications
-export const getApplications = () => api.get('/applications');
-export const createApplication = (data) => api.post('/applications', data);
+export const getApplications = () => api.get('/api/applications');
+export const createApplication = (data) =>
+  api.post('/api/applications', data);
+
 export const updateApplication = (id, data) =>
-  api.patch(`/applications/${id}`, data);
+  api.patch(`/api/applications/${id}`, data);
+
 export const deleteApplication = (id) =>
-  api.delete(`/applications/${id}`);
+  api.delete(`/api/applications/${id}`);
 
 // Locations
 export const getNearbyLocations = (city, radius = 200) =>
-  api.get('/locations/nearby', { params: { city, radius } });
+  api.get('/api/locations/nearby', { params: { city, radius } });
 
 // Assistant
 export const askAssistant = (message, currentFilters) =>
-  api.post('/assistant', { message, currentFilters });
+  api.post('/api/assistant', { message, currentFilters });
 
 export default api;

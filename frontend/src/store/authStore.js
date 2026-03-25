@@ -11,7 +11,8 @@ export const useAuthStore = create(
 
       login: async (email, password) => {
         const res = await apiLogin(email, password);
-        const { token, user } = res.data;
+        const { token, user } = res.data || {};
+
         localStorage.setItem('jt_token', token);
         set({ token, user, isAuthenticated: true });
         return user;
@@ -19,7 +20,8 @@ export const useAuthStore = create(
 
       register: async (name, email, password) => {
         const res = await apiRegister(name, email, password);
-        const { token, user } = res.data;
+        const { token, user } = res.data || {};
+
         localStorage.setItem('jt_token', token);
         set({ token, user, isAuthenticated: true });
         return user;

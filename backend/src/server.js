@@ -39,6 +39,8 @@ async function build() {
       'http://localhost:5174',
       'http://localhost:3000',
       /\.vercel\.app$/,
+      /\.onrender\.com$/,
+      'https://ai-powered-job-tracking.onrender.com'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],

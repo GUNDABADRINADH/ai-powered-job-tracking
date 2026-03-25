@@ -271,5 +271,24 @@
       }
     ],
     "notes": ""
+  },
+  {
+    "id": "c5802e02-2027-4c5d-a208-504e4d747a39",
+    "userId": "user-001",
+    "jobId": "job-ind-004",
+    "jobTitle": "Frontend Engineer - React",
+    "company": "WebWorks Ltd",
+    "location": "Bangalore",
+    "applyUrl": "https://example.com/jobs/ind-004",
+    "status": "applied",
+    "appliedAt": "2026-03-25T13:17:27.436Z",
+    "timeline": [
+      {
+        "status": "applied",
+        "timestamp": "2026-03-25T13:17:27.436Z",
+        "note": "Application submitted"
+      }
+    ],
+    "notes": ""
   }
 ]
