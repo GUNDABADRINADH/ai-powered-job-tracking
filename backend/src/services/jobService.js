@@ -150,14 +150,23 @@ function applyFilters(jobs, filters) {
  * @returns {object[]} jobs with match_score, match_explanation, matched_skills, skill_gap
  */
 async function enrichWithMatchData(jobs, resumeText) {
-  if (!resumeText) return jobs; // no resume — keep stored scores
+  if (!resumeText || !jobs.length) return jobs; 
 
-  const enriched = [];
-  for (const job of jobs) {
-    const matchData = await calculateMatch(job, resumeText);
-    enriched.push({ ...job, ...matchData });
+  const { batchCalculateMatches } = require('./matchingService');
+  
+  // Use batch AI matching for better performance
+  try {
+    return await batchCalculateMatches(jobs, resumeText);
+  } catch (err) {
+    console.warn('⚠️  Batch matching failed, falling back to sequential:', err.message);
+    // Sequential fallback using the existing calculateMatch (which also uses AI if available)
+    const enriched = [];
+    for (const job of jobs) {
+      const matchData = await calculateMatch(job, resumeText);
+      enriched.push({ ...job, ...matchData });
+    }
+    return enriched;
   }
-  return enriched;
 }
 
 /**
@@ -199,12 +208,7 @@ function paginateJobs(jobs, page, limit) {
   };
 }
 
-const ADZUNA_SKILLS = [
-  'JavaScript', 'TypeScript', 'Python', 'Java', 'Go', 'Rust', 'C++', 'C',
-  'React', 'Vue.js', 'Angular', 'Next.js', 'Node.js', 'Express', 'Django',
-  'PostgreSQL', 'MySQL', 'MongoDB', 'AWS', 'GCP', 'Docker', 'Kubernetes',
-  'Machine Learning', 'SQL', 'HTML', 'CSS', 'Tailwind'
-];
+const { KNOWN_SKILLS } = require('./matchingService');
 
 async function fetchAdzunaJobs(filters, resumeText = '') {
   const appId = process.env.ADZUNA_APP_ID;
@@ -215,25 +219,33 @@ async function fetchAdzunaJobs(filters, resumeText = '') {
   }
 
   try {
-    const baseUrl = 'https://api.adzuna.com/v1/api/jobs/in/search/1';
+    // Randomize page between 1 and 5 to get different results on each refresh
+    const randomPage = Math.floor(Math.random() * 5) + 1;
+    const baseUrl = `https://api.adzuna.com/v1/api/jobs/in/search/${randomPage}`;
     
     // Use fixed page 1 instead of random to avoid confusion
     const params = new URLSearchParams({
       app_id: appId,
       app_key: appKey,
       results_per_page: '50',
-      page: '1',
     });
 
     // Extract skills from resume if available
     const { extractSkillsFromText } = require('./matchingService');
     const resumeSkills = resumeText ? extractSkillsFromText(resumeText) : [];
 
-    // If no title/skills filter provided but user has resume skills, use those for search
-    if (filters.title) {
+    if (filters.title && filters.skills) {
+      const skillsArr = filters.skills.split(',').map(s => s.trim()).filter(Boolean);
+      const topSkills = skillsArr.slice(0, 3).join(' ');
+      params.append('what', `${filters.title} ${topSkills}`);
+      console.log('🔍 Searching Adzuna with title and skills:', `${filters.title} ${topSkills}`);
+    } else if (filters.title) {
       params.append('what', filters.title);
     } else if (filters.skills) {
-      params.append('what', filters.skills);
+      const skillsArr = filters.skills.split(',').map(s => s.trim()).filter(Boolean);
+      const topSkills = skillsArr.slice(0, 3).join(' OR ');
+      params.append('what', topSkills);
+      console.log('🔍 Searching Adzuna with selected skills:', topSkills);
     } else if (resumeSkills.length > 0) {
       // Auto-populate search with top resume skills
       const topSkills = resumeSkills.slice(0, 3).join(' OR ');
@@ -247,6 +259,8 @@ async function fetchAdzunaJobs(filters, resumeText = '') {
     // Only add location if it's not empty and not 'all'
     if (filters.location && filters.location.toLowerCase() !== 'all') {
       params.append('where', filters.location);
+    } else {
+      params.append('where', 'India');
     }
     
     if (filters.jobType) {
@@ -256,11 +270,13 @@ async function fetchAdzunaJobs(filters, resumeText = '') {
     }
 
     const url = `${baseUrl}?${params.toString()}`;
-    console.log('🌐 Fetching from Adzuna API...');
+    console.log('🌐 Adzuna request URL:', url);
 
-    const response = await fetch(url, { timeout: 5000 });
+    const response = await fetch(url);
+    console.log('🌐 Adzuna response status:', response.status);
     if (!response.ok) {
-      console.warn(`⚠️  Adzuna API error (${response.status}) - falling back to local jobs`);
+      const errBody = await response.text().catch(() => '');
+      console.warn(`⚠️  Adzuna API error (${response.status}):`, errBody.substring(0, 300));
       return [];
     }
 
@@ -274,7 +290,7 @@ async function fetchAdzunaJobs(filters, resumeText = '') {
 
     const jobs = data.results.map(job => {
       const desc = job.description || '';
-      const extractedSkills = ADZUNA_SKILLS.filter((skill) => {
+      const extractedSkills = KNOWN_SKILLS.filter((skill) => {
         try {
           return new RegExp(`\\b${escapeRegex(skill)}\\b`, 'i').test(desc);
         } catch {

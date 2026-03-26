@@ -237,13 +237,18 @@
     "company": "Zebra Technologies",
     "location": "Mumbai, Maharashtra",
     "applyUrl": "https://www.adzuna.in/details/5613051909?utm_medium=api&utm_source=d654e83e",
-    "status": "applied",
+    "status": "offer",
     "appliedAt": "2026-03-23T06:30:14.004Z",
     "timeline": [
       {
         "status": "applied",
         "timestamp": "2026-03-23T06:30:14.004Z",
         "note": "Application submitted"
+      },
+      {
+        "status": "offer",
+        "timestamp": "2026-03-26T14:06:00.000Z",
+        "note": "Status updated to offer"
       }
     ],
     "notes": ""
@@ -256,7 +261,7 @@
     "company": "WinWire",
     "location": "India",
     "applyUrl": "https://www.adzuna.in/land/ad/5670551522?se=en5WI5Im8RGuBuOkUGjjqg&utm_medium=api&utm_source=d654e83e&v=A8E5D1E077771D37D131310B7F500457A06D30D4",
-    "status": "interview",
+    "status": "rejected",
     "appliedAt": "2026-03-23T08:36:21.123Z",
     "timeline": [
       {
@@ -268,6 +273,11 @@
         "status": "interview",
         "timestamp": "2026-03-23T14:42:00.000Z",
         "note": "Status updated to interview"
+      },
+      {
+        "status": "rejected",
+        "timestamp": "2026-03-26T14:05:00.000Z",
+        "note": "Status updated to rejected"
       }
     ],
     "notes": ""
@@ -287,6 +297,135 @@
         "status": "applied",
         "timestamp": "2026-03-25T13:17:27.436Z",
         "note": "Application submitted"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "1dcac34f-009c-441c-9fe3-089c0d0ca7d5",
+    "userId": "user-001",
+    "jobId": "5637669904",
+    "jobTitle": "Senior Software Engineer",
+    "company": "Microsoft Corporation",
+    "location": "Hyderabad, Telangana",
+    "applyUrl": "https://www.adzuna.in/details/5637669904?utm_medium=api&utm_source=d654e83e",
+    "status": "interview",
+    "appliedAt": "2026-03-12T00:00:00.000Z",
+    "timeline": [
+      {
+        "status": "applied",
+        "timestamp": "2026-03-12T00:00:00.000Z",
+        "note": "Application submitted"
+      },
+      {
+        "status": "interview",
+        "timestamp": "2026-03-26T14:06:00.000Z",
+        "note": "Status updated to interview"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "8ee4aed6-c4c9-4b7b-b374-76bc4752117e",
+    "userId": "user-99a1d53f-03e3-4f39-b732-b1a4170ba881",
+    "jobId": "5663140157",
+    "jobTitle": "Workspace Support Engineer",
+    "company": "Google",
+    "location": "Bangalore, Karnataka",
+    "applyUrl": "https://www.adzuna.in/details/5663140157?utm_medium=api&utm_source=d654e83e",
+    "status": "applied",
+    "appliedAt": "2026-03-26T00:00:00.000Z",
+    "timeline": [
+      {
+        "status": "applied",
+        "timestamp": "2026-03-26T00:00:00.000Z",
+        "note": "Application submitted"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "4d304afd-4482-4be7-8e2f-5883d2a138cd",
+    "userId": "user-99a1d53f-03e3-4f39-b732-b1a4170ba881",
+    "jobId": "5260257107",
+    "jobTitle": "AI ML Engineer",
+    "company": "Arrow Electronics",
+    "location": "Noida, Ghaziabad",
+    "applyUrl": "https://www.adzuna.in/details/5260257107?utm_medium=api&utm_source=d654e83e",
+    "status": "applied",
+    "appliedAt": "2026-03-26T07:37:37.944Z",
+    "timeline": [
+      {
+        "status": "applied",
+        "timestamp": "2026-03-26T07:37:37.944Z",
+        "note": "Application submitted"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "39400ca5-115f-40b9-b0e1-16b2ceefcdf1",
+    "userId": "user-99a1d53f-03e3-4f39-b732-b1a4170ba881",
+    "jobId": "2792650929",
+    "jobTitle": "Senior Full Stack Engineer",
+    "company": "KNR Management Consultants",
+    "location": "Chennai, Tamil Nadu",
+    "applyUrl": "https://www.adzuna.in/details/2792650929?utm_medium=api&utm_source=d654e83e",
+    "status": "applied",
+    "appliedAt": "2026-03-26T07:37:48.083Z",
+    "timeline": [
+      {
+        "status": "applied",
+        "timestamp": "2026-03-26T07:37:48.083Z",
+        "note": "Application submitted"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "6547817c-1bc9-4a3b-b8a8-67f25c72f7f7",
+    "userId": "user-001",
+    "jobId": "5606113469",
+    "jobTitle": "Apigee Developer",
+    "company": "SID Global Solutions",
+    "location": "Hyderabad, Telangana",
+    "applyUrl": "https://www.adzuna.in/land/ad/5606113469?se=3mAEjhwp8RG1rYI0QwAjrQ&utm_medium=api&utm_source=d654e83e&v=7B078733182B106C1FB2216390787F52A7D8A5A7",
+    "status": "rejected",
+    "appliedAt": "2026-03-26T14:03:38.215Z",
+    "timeline": [
+      {
+        "status": "applied",
+        "timestamp": "2026-03-26T14:03:38.215Z",
+        "note": "Application submitted"
+      },
+      {
+        "status": "rejected",
+        "timestamp": "2026-03-26T14:05:00.000Z",
+        "note": "Status updated to rejected"
+      }
+    ],
+    "notes": ""
+  },
+  {
+    "id": "879d4366-2e62-4eef-a3c0-301cbee02aee",
+    "userId": "user-001",
+    "jobId": "5637855407",
+    "jobTitle": "Software Development Engineer in Test III",
+    "company": "GreyOrange",
+    "location": "India",
+    "applyUrl": "https://www.adzuna.in/land/ad/5637855407?se=3mAEjhwp8RG1rYI0QwAjrQ&utm_medium=api&utm_source=d654e83e&v=DE5AA03649056B749418AAA18A2B28190B67BA82",
+    "status": "interview",
+    "appliedAt": "2026-03-26T00:00:00.000Z",
+    "timeline": [
+      {
+        "status": "applied",
+        "timestamp": "2026-03-26T00:00:00.000Z",
+        "note": "Application submitted"
+      },
+      {
+        "status": "interview",
+        "timestamp": "2026-03-26T14:05:00.000Z",
+        "note": "Status updated to interview"
       }
     ],
     "notes": ""

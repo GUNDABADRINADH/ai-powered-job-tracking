@@ -16,11 +16,17 @@
     "@fastify/multipart": "^8.3.0",
     "@fastify/static": "^7.0.4",
     "@google/generative-ai": "^0.24.1",
+    "@langchain/core": "^1.1.36",
+    "@langchain/google-genai": "^2.1.26",
+    "@langchain/langgraph": "^1.2.5",
     "dotenv": "^16.4.5",
     "fastify": "^4.27.0",
     "fastify-plugin": "^4.5.1",
+    "langchain": "^1.2.37",
     "pdf-parse": "^1.1.1",
     "pino-pretty": "^11.3.0",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "z": "^1.0.9",
+    "zod": "^4.3.6"
   }
 }

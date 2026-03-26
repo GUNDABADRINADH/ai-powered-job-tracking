@@ -56,5 +56,78 @@
     "resumeSkills": [],
     "resumeFileName": "",
     "createdAt": "2026-03-25T13:26:40.825Z"
+  },
+  {
+    "id": "user-99a1d53f-03e3-4f39-b732-b1a4170ba881",
+    "name": "Ganesh",
+    "email": "Ganesh@gmail.com",
+    "password": "a5cfbc3349f6fae54f6fe84227569fd2613bfda3a790b171033dde983b575386",
+    "avatar": "GA",
+    "resumeText": "\n\nCHARLES MCTURLAND\nSOFTWARE ENGINEER\nCONTACT\ncmcturland@email.com\n(123) 456-7890\nNew York, NY\nLinkedIn\nEDUCATION\nB.S.\nComputer Science\nUniversity of Pittsburgh\nSeptember 2015 - April 2019\nPittsburgh, PA\nSKILLS\nPython\nJava\nSQL\nREST API Development\nAnalytical Problem Solving\nTechnical Documentation\nAgile Development Practices\nWORK EXPERIENCE\nSoftware Engineer\nEmbark\nJanuary 2022 - current/New York, NY\nArchitected backend services supporting vehicle logistics workflows,\nenabling dispatch systems to process ~12k shipment events per day\nwith reliable status synchronization.\nOptimized route-planning queries in a microservices environment using\nPython and PostgreSQL, reducing average API response time by 38%\nduring peak operations.\nImplemented automated validation checks across shipment ingestion\npipelines, improving operational data accuracy across 5 core internal\nsystems used by dispatch teams.\nPartnered with product and operations stakeholders to ship incremental\nplatform releases on a bi-weekly cadence, accelerating delivery of new\ncarrier integration features.\nSoftware Engineer\nMarketSmart\nApril 2019 - January 2022/Washington, DC\nDeveloped new lead-scoring features for a marketing analytics platform,\nincreasing predictive model precision by 21% for donor engagement\ncampaigns.\nRefactored legacy data processing modules into modular services,\ndecreasing average batch processing time by 17 minutes per run.\nIntegrated REST APIs connecting CRM systems and campaign analytics\ntools, supporting data exchange across 3 enterprise client platforms.\nCollaborated with data science and product teams to deploy\nexperimentation pipelines that supported dozens of A/B campaign tests\nannually.\nSoftware Engineer Intern\nMarketing Science Company\nApril 2018 - March 2019/Pittsburgh, PA\nBuilt internal dashboards to visualize campaign performance metrics,\nenabling analysts to monitor 150+ active advertising experiments.\nAutomated recurring data preparation tasks in Python, reducing manual\nanalyst workload by ~6 hours per week.\nInvestigated anomalies in digital campaign reporting pipelines, resolving\ndiscrepancies affecting three client reporting workflows.\nDocumented ETL processes and onboarding guides that shortened\nramp-up time for incoming interns by one training session.",
+    "resumeSkills": [
+      "Python",
+      "Java",
+      "C",
+      "REST APIs",
+      "PostgreSQL",
+      "Git",
+      "Agile"
+    ],
+    "resumeFileName": "software-engineer-resume-example.pdf",
+    "createdAt": "2026-03-26T07:08:50.501Z",
+    "resumeLocation": null,
+    "resumeExtractedName": "CHARLES MCTURLAND"
+  },
+  {
+    "id": "user-1f53e660-3f0a-40e4-b5a4-b72469017209",
+    "name": "ai poweres",
+    "email": "aipowered@gmail.com",
+    "password": "e9aacfb20f6073fae0cf28b744ca07355e62cdfac0001310ba2e3659696b1b3f",
+    "avatar": "AI",
+    "resumeText": "\n\nGunda Badrinadh\n+91-9493051600 | Gundabadrinadh@gmail.com\nSuryapet, Telangana – 508213\nProfessional Summary\nAI ML-focused Computer Science student with hands-on experience in computer vision, automation, and\ndataset engineering. Passionate about building intelligent systems and scalable AI solutions. Seeking\nopportunities in AI Engineering / Software Development roles where I can contribute to real-world problem\nsolving.\nEducation\n•\nBachelor of Technology in Computer Science and Engineering (AI & ML)2022 – 2026\nAnurag Engineering College, KodadCGPA: 8.18\nPersonal Projects\n•\nGesture-Controlled PowerPoint Presentation System\nComputer vision-based system to control presentation slides using hand gestures.\n– Implemented real-time hand gesture detection to map gestures to slide navigation actions.\n– Integrated gesture recognition logic with system-level automation for presentation control.\n– Tested system responsiveness and accuracy under varying conditions.\n– Prepared functional documentation outlining gesture mapping and execution flow.\n•\nText-to-Speech Synthesizer\nWeb-based text-to-speech converter implemented using JavaScript APIs.\n– Improved accessibility by enabling audio output for on-screen text.\n– Enhanced usability for learning and content-consumption applications.\n– Technologies used: HTML, CSS, JavaScript.\n•\nAutomated File Organisation and Data Visualization\nPython-based automation system to categorize multimedia files by type.\n– Organized files into structured folders to improve data retrieval and management.\n– Applied basic machine learning logic for file classification.\n– Technologies used: Python, ML algorithms.\nExperience\n•\nAI Creators InternshipAug 2024\nAICTE – Swecha\n– Supported AI dataset development through structured collection and processing of real-world audio and video\ndata.\n– Followed defined standards to ensure data quality and consistency for speech and vision-based model training.\n– Assisted in data validation to support model accuracy.\n– Maintained documentation related to data sources and collection procedures.\nTechnical Skills\nProgramming Languages: C, Python, Java, JavaScript, HTML5, CSS3\nDevelopment Tools: VS Code, Git, GitHub\nTechnical Concepts: Data Structures & Algorithms, Object-Oriented Programming, Machine Learning, Web APIs\nLibraries & Frameworks: Python Libraries (pandas, scikit-learn, NumPy), JavaScript Libraries\nCore Competencies: Algorithm Design, Code Optimization, System Design, Problem Solving, Software\nDevelopment\nLanguages Known: English, Telugu\nActivities and Volunteering\n•\nNSS Volunteer – Conducted structured field surveys to document feedback on government scheme utilization.\n•\nBlood Donation Camp Volunteer – Assisted in coordination with a district government hospital.\n•\nAttended Workshop on Drone Technology (Nov 2024).",
+    "resumeSkills": [
+      "JavaScript",
+      "Python",
+      "Java",
+      "Go",
+      "C",
+      "Git",
+      "GitHub",
+      "scikit-learn",
+      "pandas",
+      "NumPy",
+      "Machine Learning",
+      "CSS",
+      "Accessibility",
+      "System Design"
+    ],
+    "resumeFileName": "BADRINADH_GUNDA_RESUME.pdf",
+    "createdAt": "2026-03-26T07:40:25.425Z",
+    "resumeLocation": null,
+    "resumeExtractedName": "Gunda Badrinadh"
+  },
+  {
+    "id": "user-d97910c3-c341-4755-8915-554dcb329346",
+    "name": "abhi",
+    "email": "abhi@gmail.com",
+    "password": "e382f7a1d9fdc62bfe38801f5ff51397f06308bca838e1852cfd45dd0bfe9a9c",
+    "avatar": "AB",
+    "resumeText": "\n\nGunda Badrinadh\nSuryapet, Telangana, India\n+91-9493051600  —  Gundabadrinadh@gmail.com\nProfessional Summary\nComputer Science (AI & ML) undergraduate with strong interest in embedded intelligence, human–machine inter-\nfaces, and edge computing systems.  Experience in computer vision, signal-oriented data processing, and real-world\nsensor  data  pipelines.   Motivated  to  contribute  to  semiconductor-driven  intelligent  hardware  systems  and  next-\ngeneration computing platforms.\nEducation\nB.Tech – Computer Science and Engineering (AI & ML)2022–2026\nAnurag Engineering College, Kodad\nCGPA: 8.18\nSemiconductor-Relevant Projects\nGesture-Controlled Human–Computer Interface for Presentation Systems\n•  Designed a vision-based gesture interface enabling touch-free slide navigation using camera input.\n•  Implemented real-time hand-gesture detection pipeline mapped to system-level control commands.\n•  Optimized response latency for interactive control scenarios and usability.\n•  Documented gesture-to-command execution architecture for system integration.\nAutomated File Classification and Data Processing System\n•  Built Python-based automated multimedia classification and structured storage system.\n•  Applied machine learning techniques for content-type detection and categorization.\n•  Implemented efficient data organization workflows improving retrieval efficiency.\nExperience\nAI Creators Internship – Swecha (AICTE)Aug 2024\n•  Collected and curated structured audio–visual datasets following defined acquisition protocols.\n•  Ensured data quality and consistency for vision and speech model training pipelines.\n•  Performed dataset validation and documentation of data collection workflows.\n•  Supported preparation of sensor-like data for AI system development.\nTechnical Skills\nProgramming:  C, Python, Java\nCore Concepts:  Data Structures & Algorithms, Object-Oriented Programming, Machine Learning Basics, Com-\nputer Vision, Signal-oriented Data Processing, Human–Computer Interaction\nTools:  Git, GitHub, VS Code\nLibraries:  NumPy, pandas, scikit-learn\nTechnical Interests\nEmbedded  AI  Systems,  Edge  Computing,  Human–Machine  Interfaces,  Intelligent  Hardware  Systems,  Computer\nVision at Edge Devices\nActivities\nParticipation Certificate on HFSS Workshop organized by AEC.\nNSS Volunteer – Field survey data collection and structured reporting\nBlood Donation Camp Volunteer – Event coordination with government hospital\nWorkshop on Drone Technology (2024)\n1",
+    "resumeSkills": [
+      "Python",
+      "Java",
+      "Go",
+      "C",
+      "Git",
+      "GitHub",
+      "scikit-learn",
+      "pandas",
+      "NumPy",
+      "Machine Learning"
+    ],
+    "resumeFileName": "BADRINADH_GUNDA-RESUME.pdf",
+    "createdAt": "2026-03-26T13:22:55.447Z",
+    "resumeLocation": null,
+    "resumeExtractedName": "Gunda Badrinadh"
   }
 ]

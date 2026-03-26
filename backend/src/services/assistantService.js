@@ -1,280 +1,190 @@
 'use strict';
 
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-
-let lastMessage = ''; // Cache to handle routes passing intent instead of message
+const { StateGraph, START, END, MemorySaver } = require("@langchain/langgraph");
+const { ChatGoogleGenerativeAI } = require("@langchain/google-genai");
+const { PromptTemplate } = require("@langchain/core/prompts");
+const { StringOutputParser } = require("@langchain/core/output_parsers");
 
 /**
  * assistantService.js
- * Keyword-based stub for AI assistant logic.
- *
- * Integration points:
- *   - detectIntent()    → replace with LangChain intent classifier
- *   - extractFilters()  → replace with LangChain structured filter extraction
- *   - buildResponse()   → replace with LangGraph agent reply generation
+ * LangGraph-based AI assistant logic handling intent, filters, and responses.
  */
 
-// Valid action enum — enforced in buildResponse
 const VALID_ACTIONS = ['search_jobs', 'update_filters', 'help', 'clear_filters'];
 
-/**
- * Detect the intent of an incoming message.
- * Uses Gemini API with keyword-based fallback for robustness.
- *
- * @param {string} message
- * @returns {string} intent key
- */
-async function detectIntent(message) {
-  lastMessage = message;
-
-  // Always try keyword-based detection first - it's more reliable
-  const keywordIntent = keywordBasedIntent(message);
-  console.log('📌 Keyword detection result:', keywordIntent);
-  
-  // If keyword detection found something specific (not 'help'), use it
-  if (keywordIntent !== 'help') {
-    console.log(`✅ Using keyword intent: ${keywordIntent}`);
-    return keywordIntent;
-  }
-
-  // Only use Gemini API for ambiguous cases if key exists
-  if (!process.env.GEMINI_API_KEY) {
-    console.log('⚠️ No Gemini API key, returning keyword result:', keywordIntent);
-    return keywordIntent;
-  }
-
-  try {
-    console.log('🌐 Calling Gemini API for intent classification...');
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const prompt = `Classify user intent from message. Return ONLY one exact word: search_jobs, update_filters, help, clear_filters
-Message: "${message}"`;
-    const result = await model.generateContent(prompt);
-    let intent = result.response.text().trim().toLowerCase();
-    
-    // Clean response
-    intent = intent.replace(/[^a-z_]/g, '').trim();
-    
-    if (['search_jobs', 'update_filters', 'help', 'clear_filters'].includes(intent)) {
-      console.log(`✅ Gemini intent: ${intent}`);
-      return intent;
-    }
-  } catch (err) {
-    console.error("❌ Gemini detectIntent error:", err.message);
-  }
-
-  // If everything fails, use keyword detection result
-  console.log(`✅ Fallback to keyword result: ${keywordIntent}`);
-  return keywordIntent;
-}
-
-/**
- * Keyword-based intent detection as fallback
- * @param {string} message
- * @returns {string} intent key
- */
+// Fallback: Keyword-based intent detection
 function keywordBasedIntent(message) {
   const msg = message.toLowerCase();
-  
-  // Clear filters - highest priority
-  if (/clear|reset|remove.*filter|show.*all/i.test(msg)) {
-    return 'clear_filters';
-  }
-  
-  // Update/filter intent - ANY of these keywords trigger filter update
-  // Location keywords
-  if (/location|city|cities|place|area|region|hyderabad|bangalore|bengaluru|delhi|mumbai|pune|chennai|kolkata|hydera|banglore/i.test(msg)) {
-    return 'update_filters';
-  }
-  
-  // Work mode keywords
-  if (/remote|onsite|on-site|hybrid|work.*mode|working.*from/i.test(msg)) {
-    return 'update_filters';
-  }
-  
-  // Job type keywords
-  if (/full.?time|part.?time|contract|freelance|permanent|temporary|job type/i.test(msg)) {
-    return 'update_filters';
-  }
-  
-  // Skill keywords
-  if (/skill|language|technology|framework|library|tool|react|python|java|node|sql|aws/i.test(msg)) {
-    return 'update_filters';
-  }
-  
-  // Filter/experience keywords
-  if (/filter|experience|salary|minimum|maximum|year|require|looking for|want|prefer/i.test(msg)) {
-    return 'update_filters';
-  }
-  
-  // Search intent
-  if (/search|find|show|get|list|display|browse|job|role|position/i.test(msg)) {
-    return 'search_jobs';
-  }
-  
-  // Default to help
+  if (/clear|reset|remove.*filter|show.*all/i.test(msg)) return 'clear_filters';
+  if (/location|city|cities|place|area|region|hyderabad|bangalore|bengaluru|delhi|mumbai|pune|chennai|kolkata|hydera|banglore/i.test(msg)) return 'update_filters';
+  if (/remote|onsite|on-site|hybrid|work.*mode|working.*from/i.test(msg)) return 'update_filters';
+  if (/full.?time|part.?time|contract|freelance|permanent|temporary|job type/i.test(msg)) return 'update_filters';
+  if (/skill|language|technology|framework|library|tool|react|python|java|node|sql|aws/i.test(msg)) return 'update_filters';
+  if (/filter|experience|salary|minimum|maximum|year|require|looking for|want|prefer/i.test(msg)) return 'update_filters';
+  if (/search|find|show|get|list|display|browse|job|role|position/i.test(msg)) return 'search_jobs';
   return 'help';
 }
 
-/**
- * Extract filter parameters from the message.
- * Uses Gemini API with keyword-based fallback for robustness.
- *
- * @param {string} message
- * @param {object} currentFilters
- * @returns {object}
- */
-async function extractFilters(message, currentFilters = {}) {
+// Fallback: Keyword-based filter extraction
+function keywordBasedExtraction(message, currentFilters = {}) {
   const normalized = { ...currentFilters };
-  
-  // ALWAYS try keyword-based extraction first
-  console.log('🔍 Attempting keyword-based filter extraction...');
-  
-  // Extract location keywords - check for common job search locations
   const locationMap = {
-    'hyderabad': 'Hyderabad',
-    'bangalore': 'Bangalore',
-    'bengaluru': 'Bangalore',
-    'delhi': 'Delhi',
-    'mumbai': 'Mumbai',
-    'pune': 'Pune',
-    'chennai': 'Chennai',
-    'kolkata': 'Kolkata',
-    'new york': 'New York',
-    'california': 'California',
-    'london': 'London',
-    'toronto': 'Toronto',
-    'sydney': 'Sydney',
-    'remote': 'Remote'
+    'hyderabad': 'Hyderabad', 'bangalore': 'Bangalore', 'bengaluru': 'Bangalore', 
+    'delhi': 'Delhi', 'mumbai': 'Mumbai', 'pune': 'Pune', 'chennai': 'Chennai', 
+    'kolkata': 'Kolkata', 'new york': 'New York', 'california': 'California', 
+    'london': 'London', 'toronto': 'Toronto', 'sydney': 'Sydney', 'remote': 'Remote'
   };
-  
   const msgLower = message.toLowerCase();
   const foundLocations = [];
-  
-  // Check for each location keyword in the message
   for (const [keyword, displayName] of Object.entries(locationMap)) {
-    if (msgLower.includes(keyword)) {
-      foundLocations.push(displayName);
-    }
+    if (msgLower.includes(keyword)) foundLocations.push(displayName);
   }
-  
-  if (foundLocations.length > 0) {
-    normalized.location = foundLocations.join(',');
-    console.log('✅ Keyword extraction found location:', normalized.location);
-    return normalized;
-  }
-
-  // If no Gemini API key, return early
-  if (!process.env.GEMINI_API_KEY) {
-    console.log('⚠️ No Gemini API key, returning current filters:', normalized);
-    return normalized;
-  }
-
-  // Try Gemini extraction as secondary method
-  try {
-    console.log('🌐 Attempting Gemini API filter extraction...');
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      generationConfig: { responseMimeType: "application/json" }
-    });
-    
-    const prompt = `Extract job search filters from this message. Return valid JSON only.
-Supported filters: title, skills, location, jobType, workMode, datePosted
-
-Rules:
-- For locations like "Hyderabad and Bangalore", use: "location": "Hyderabad,Bangalore"
-- For skills like "React and Python", use: "skills": "React,Python"  
-- For jobType, use values like: "Full-time", "Part-time", "Contract" (comma-separated)
-- For workMode, use values like: "Remote", "Onsite", "Hybrid" (comma-separated)
-- Return only {} if no filters found
-
-Message: "${message}"`;
-
-    const result = await model.generateContent(prompt);
-    const extractedStr = result.response.text();
-    console.log('Gemini extracted raw:', extractedStr);
-    
-    // Clean response - remove markdown code blocks if present
-    const cleanedStr = extractedStr
-      .replace(/```json\n?/g, '')
-      .replace(/```\n?/g, '')
-      .trim();
-    
-    const extracted = JSON.parse(cleanedStr);
-    console.log('Gemini extracted JSON:', extracted);
-    
-    // Convert comma-separated strings to arrays for specific fields
-    if (extracted.skills && typeof extracted.skills === 'string') {
-      normalized.skills = extracted.skills.split(',').map(s => s.trim()).filter(Boolean);
-    } else if (extracted.skills) {
-      normalized.skills = extracted.skills;
-    }
-    
-    if (extracted.jobType && typeof extracted.jobType === 'string') {
-      normalized.jobType = extracted.jobType.split(',').map(s => s.trim()).filter(Boolean);
-    } else if (extracted.jobType) {
-      normalized.jobType = extracted.jobType;
-    }
-    
-    if (extracted.workMode && typeof extracted.workMode === 'string') {
-      normalized.workMode = extracted.workMode.split(',').map(s => s.trim()).filter(Boolean);
-    } else if (extracted.workMode) {
-      normalized.workMode = extracted.workMode;
-    }
-    
-    // Keep location and title as strings
-    if (extracted.location) {
-      normalized.location = extracted.location;
-      console.log('✅ Gemini found location:', extracted.location);
-    }
-    if (extracted.title) {
-      normalized.title = extracted.title;
-    }
-    if (extracted.datePosted) {
-      normalized.datePosted = extracted.datePosted;
-    }
-    
-    console.log("✅ Final normalized filters from Gemini:", normalized);
-    return normalized;
-  } catch (err) {
-    console.error("❌ Gemini extractFilters error:", err.message);
-    console.log('⚠️ Falling back to keyword extraction...');
-    return normalized;
-  }
+  if (foundLocations.length > 0) normalized.location = foundLocations.join(',');
+  return normalized;
 }
 
-/**
- * Build the structured assistant response.
- * Always returns { reply: string, action: string, filters: object|null }.
- * action is always one of: search_jobs | update_filters | help | clear_filters
- *
- * @param {string} intent
- * @param {object|null} filters
- * @returns {{ reply: string, action: string, filters: object|null }}
- */
-function buildResponse(intent, filters) {
-  const VALID_ACTIONS = ['search_jobs', 'update_filters', 'help', 'clear_filters'];
+// 1. Define graph state channels
+const GraphState = {
+  message: { value: (x, y) => y ?? x, default: () => "" },
+  intent: { value: (x, y) => y ?? x, default: () => "" },
+  filters: { value: (x, y) => y ?? x, default: () => ({}) },
+  response: { value: (x, y) => y ?? x, default: () => "" },
+  action: { value: (x, y) => y ?? x, default: () => "" }
+};
 
-  // Map intent → action (only valid enum values)
-  const actionMap = {
-    clear_filters: 'clear_filters',
-    search_jobs:   'search_jobs',
-    update_filters:'update_filters',
-    help:          'help',
-  };
+// 2. Define Nodes
+const detectIntentNode = async (state) => {
+  let intent = "help";
+  try {
+    if (!process.env.GEMINI_API_KEY) throw new Error("No API key");
+    const model = new ChatGoogleGenerativeAI({ 
+      modelName: "gemini-1.5-flash", 
+      temperature: 0, 
+      apiKey: process.env.GEMINI_API_KEY 
+    });
+    const prompt = PromptTemplate.fromTemplate(`Classify user intent from message. Return ONLY one exact word: search_jobs, update_filters, help, clear_filters
+Rules:
+- search_jobs: User wants to find or show brand new roles (e.g., "find jobs", "show jobs", "fullstack developer roles", "python developer jobs").
+- update_filters: User wants to refine the current job list (e.g., "make it remote", "only in New York").
+- clear_filters: Clear all current filters.
+- help: General questions or help.
+Message: "{message}"`);
+    const chain = prompt.pipe(model).pipe(new StringOutputParser());
+    const res = await chain.invoke({ message: state.message });
+    
+    intent = res.trim().toLowerCase().replace(/[^a-z_]/g, '');
+    if (!VALID_ACTIONS.includes(intent)) intent = 'help';
+  } catch (err) {
+    console.warn("LangChain intent fallback:", err.message);
+    intent = keywordBasedIntent(state.message);
+  }
+  return { intent };
+};
 
+const extractFiltersNode = async (state) => {
+  if (state.intent === 'clear_filters') return { filters: {} };
+  if (state.intent === 'help') return { filters: state.filters };
+  
+  try {
+    if (!process.env.GEMINI_API_KEY) throw new Error("No API key");
+    const model = new ChatGoogleGenerativeAI({ 
+      modelName: "gemini-1.5-flash", 
+      temperature: 0, 
+      apiKey: process.env.GEMINI_API_KEY 
+    });
+    
+    const prompt = PromptTemplate.fromTemplate(`Extract job search filters as JSON. Supported formats: title, skills, location, jobType, workMode. Return ONLY valid JSON, no markdown code blocks. 
+Rules: comma-separated list of strings for skills, jobType, and workMode. 
+Message: "{message}"`);
+    
+    const chain = prompt.pipe(model).pipe(new StringOutputParser());
+    const res = await chain.invoke({ message: state.message });
+    
+    const cleanedStr = res.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const extracted = JSON.parse(cleanedStr || "{}");
+    const normalized = { ...state.filters };
+    
+    if (extracted.skills) normalized.skills = Array.isArray(extracted.skills) ? extracted.skills : extracted.skills.split(',').map(s=>s.trim());
+    if (extracted.jobType) normalized.jobType = Array.isArray(extracted.jobType) ? extracted.jobType : extracted.jobType.split(',').map(s=>s.trim());
+    if (extracted.workMode) normalized.workMode = Array.isArray(extracted.workMode) ? extracted.workMode : extracted.workMode.split(',').map(s=>s.trim());
+    if (extracted.location) normalized.location = extracted.location;
+    if (extracted.title) normalized.title = extracted.title;
+    
+    return { filters: normalized };
+  } catch (err) {
+    console.warn("LangChain extraction fallback:", err.message);
+    return { filters: keywordBasedExtraction(state.message, state.filters) };
+  }
+};
+
+const buildResponseNode = async (state) => {
   const replyMap = {
     clear_filters: "Filters cleared! 🧹 Showing all available jobs again.",
     search_jobs:   "Searching across all available jobs now! 🔍 Let me know if you want to narrow it down.",
     update_filters:"I've updated your filters based on your request! 🎯",
     help:          "I'm your AI job search assistant! 🤖 Try: \"Show me remote React jobs\" or \"What are my best matches?\"",
   };
+  return { 
+    response: replyMap[state.intent] || replyMap.help,
+    action: VALID_ACTIONS.includes(state.intent) ? state.intent : 'help'
+  };
+};
 
-  const action = VALID_ACTIONS.includes(actionMap[intent]) ? actionMap[intent] : 'help';
-  const reply  = replyMap[intent] ?? replyMap.help;
+const routeNode = (state) => {
+  return state.intent;
+};
 
-  return { reply, action, filters };
+// 3. Build LangGraph
+const workflow = new StateGraph({ channels: GraphState });
+
+workflow.addNode("detectIntentNode", detectIntentNode);
+workflow.addNode("extractFiltersNode", extractFiltersNode);
+workflow.addNode("buildResponseNode", buildResponseNode);
+
+// 4. Edges and conditionals
+workflow.addEdge(START, "detectIntentNode");
+
+workflow.addConditionalEdges("detectIntentNode", routeNode, {
+  "search_jobs": "extractFiltersNode",
+  "update_filters": "extractFiltersNode",
+  "clear_filters": "extractFiltersNode",
+  "help": "buildResponseNode"
+});
+
+workflow.addEdge("extractFiltersNode", "buildResponseNode");
+workflow.addEdge("buildResponseNode", END);
+
+// 5. Memory checkpointer for state
+const memory = new MemorySaver();
+const app = workflow.compile({ checkpointer: memory });
+
+// 6. External API wrappers (Do NOT modify route expectation)
+let latestGraphState = null;
+
+async function detectIntent(message) {
+  const state = await detectIntentNode({ message, intent: '', filters: {}, response: '', action: '' });
+  return state.intent;
+}
+
+async function extractFilters(message, currentFilters = {}) {
+  const finalState = await app.invoke(
+    { message, intent: '', filters: currentFilters, response: '', action: '' },
+    { configurable: { thread_id: "assistant-thread-1" } }
+  );
+  
+  latestGraphState = finalState;
+  return finalState.filters;
+}
+
+function buildResponse(intent, filters) {
+  if (latestGraphState) {
+    return {
+      reply: latestGraphState.response,
+      action: latestGraphState.action,
+      filters: latestGraphState.filters
+    };
+  }
+  return { reply: "Let's search for some jobs!", action: intent || 'help', filters };
 }
 
 module.exports = { detectIntent, extractFilters, buildResponse };

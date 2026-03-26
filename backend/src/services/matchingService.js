@@ -1,13 +1,9 @@
-'use strict';
-
-// Gemini API disabled due to quota exhaustion (1000/day free tier limit exceeded)
-// Using pure keyword-based matching instead
-// No embeddings will be used
-
+const { ChatGoogleGenerativeAI } = require('@langchain/google-genai');
+const { PromptTemplate } = require('@langchain/core/prompts');
+const { StringOutputParser } = require('@langchain/core/output_parsers');
 /**
  * matchingService.js
- * Pure, isolated matching logic.
- * Replace the stub implementations below with LangChain calls when ready.
+ * Unified matching logic with AI-powered scoring.
  */
 
 // Skill keyword list shared across parse + matching
@@ -43,13 +39,21 @@ function extractSkillsFromText(resumeText) {
 /**
  * Calculate how well a single job matches the candidate's resume.
  *
- * Integration point: replace body with a LangChain structured-output call.
- *
- * @param {object} job        - Job object from jobs.json
- * @param {string} resumeText - Raw resume text from the user profile
+ * @param {object} job        - Job object
+ * @param {string} resumeText - Raw resume text
  * @returns {{ match_score: number, match_explanation: string, matched_skills: string[], skill_gap: string[] }}
  */
 async function calculateMatch(job, resumeText) {
+  // If we have an AI key, use AI matching
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      return await calculateAIMatch(job, resumeText);
+    } catch (err) {
+      console.warn('⚠️  Gemini AI Match failed, falling back to keywords:', err.message);
+    }
+  }
+
+  // Fallback to keyword matching
   const resumeSkills = extractSkillsFromText(resumeText);
   const jobSkills    = Array.isArray(job.skills) ? job.skills : [];
 
@@ -60,29 +64,152 @@ async function calculateMatch(job, resumeText) {
     !resumeSkills.some((r) => r.toLowerCase() === s.toLowerCase())
   );
 
-  // Score: percentage of job skills covered by resume (0–100)
   let score = jobSkills.length > 0
     ? Math.round((matched.length / jobSkills.length) * 100)
-    : job.match_score ?? 0; // fall back to stored score if job has no skills list
-
-  let explanation =
-    matched.length > 0
-      ? `You match ${matched.length} of ${jobSkills.length} required skills: ${matched.join(', ')}.`
-      : 'No direct skill overlap detected with your resume.';
+    : job.match_score ?? 0;
 
   return {
     match_score:        score,
-    match_explanation:  explanation,
+    match_explanation:  matched.length > 0
+      ? `You match ${matched.length} of ${jobSkills.length} required keywords.`
+      : 'No direct keyword overlap detected.',
     matched_skills:     matched,
     skill_gap:          skillGap,
   };
 }
 
 /**
- * Return the top N best-matched jobs (match_score > 70), sorted descending.
+ * Individual AI matching using Gemini wrapped in LangChain
+ */
+async function calculateAIMatch(job, resumeText) {
+  const model = new ChatGoogleGenerativeAI({
+    modelName: "gemini-1.5-flash",
+    apiKey: process.env.GEMINI_API_KEY,
+    temperature: 0,
+    maxRetries: 2,
+  });
+
+  const promptTemplate = new PromptTemplate({
+    template: `Evaluate how well the candidate's resume matches this job description.
+Job Title: {jobTitle}
+Company: {company}
+Description: {jobDescription}
+
+Candidate Resume:
+{resumeText}
+
+Return valid JSON exactly matching this format:
+{{
+  "match_score": number (0-100),
+  "match_explanation": "brief, 1-2 sentences",
+  "matched_skills": ["skill1", "skill2"],
+  "skill_gap": ["skill3", "skill4"]
+}}`,
+    inputVariables: ["jobTitle", "company", "jobDescription", "resumeText"],
+  });
+
+  const chain = promptTemplate.pipe(model).pipe(new StringOutputParser());
+
+  const responseText = await chain.invoke({
+    jobTitle: job.title || "Unknown",
+    company: job.company || "Unknown",
+    jobDescription: job.description || "",
+    resumeText: resumeText || "",
+  });
+
+  const cleanedStr = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+  const parsed = JSON.parse(cleanedStr);
+  
+  // Ensure the response matches expected format
+  return {
+    match_score: parsed.match_score ?? 0,
+    match_explanation: parsed.match_explanation || "AI matching completed.",
+    matched_skills: parsed.matched_skills || [],
+    skill_gap: parsed.skill_gap || []
+  };
+}
+
+/**
+ * Batch AI matching to improve performance
  * @param {object[]} jobs
- * @param {number}   [limit=8]
- * @returns {object[]}
+ * @param {string} resumeText
+ * @returns {Promise<object[]>} enriched jobs
+ */
+async function batchCalculateMatches(jobs, resumeText) {
+  if (!process.env.GEMINI_API_KEY) {
+    // Sequential fallback if no key (though this should be checked by caller)
+    const enriched = [];
+    for (const job of jobs) enriched.push({ ...job, ...(await calculateMatch(job, resumeText)) });
+    return enriched;
+  }
+
+  const BATCH_SIZE = 10;
+  const enriched = [];
+
+  for (let i = 0; i < jobs.length; i += BATCH_SIZE) {
+    const batch = jobs.slice(i, i + BATCH_SIZE);
+    console.log(`🧠 AI Matching Batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(jobs.length / BATCH_SIZE)}...`);
+    
+    try {
+      const model = new ChatGoogleGenerativeAI({
+        modelName: "gemini-1.5-flash",
+        apiKey: process.env.GEMINI_API_KEY,
+        temperature: 0,
+        maxRetries: 2,
+      });
+
+      const promptTemplate = new PromptTemplate({
+        template: `Evaluate how well the candidate's resume matches these {batchSize} jobs.
+      
+Candidate Resume:
+{resumeText}
+
+Jobs to Evaluate:
+{jobsData}
+
+Return JSON array of EXACTLY {batchSize} objects corresponding to each job:
+[
+  {{
+    "match_score": number, 
+    "match_explanation": string, 
+    "matched_skills": string[], 
+    "skill_gap": string[]
+  }}
+]`,
+        inputVariables: ["batchSize", "resumeText", "jobsData"],
+      });
+
+      const chain = promptTemplate.pipe(model).pipe(new StringOutputParser());
+
+      const jobsDataStr = batch.map((j, idx) => `ID ${idx}: ${j.title} at ${j.company}\nDescription: ${j.description}`).join('\n---\n');
+
+      const responseText = await chain.invoke({
+        batchSize: batch.length,
+        resumeText: resumeText,
+        jobsData: jobsDataStr
+      });
+
+      const cleanedStr = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      const resData = JSON.parse(cleanedStr);
+
+      if (Array.isArray(resData)) {
+        batch.forEach((job, idx) => {
+          enriched.push({ ...job, ...(resData[idx] || {}) });
+        });
+      } else {
+        throw new Error("Invalid AI batch response");
+      }
+    } catch (err) {
+      console.warn(`⚠️  AI Batch fail at index ${i}, falling back to individual scoring:`, err.message);
+      for (const job of batch) enriched.push({ ...job, ...(await calculateMatch(job, resumeText)) });
+    }
+  }
+
+  return enriched;
+}
+
+/**
+ * Return the top N best-matched jobs (match_score > 70), sorted descending.
  */
 function getBestMatches(jobs, limit = 8) {
   return jobs
@@ -91,4 +218,4 @@ function getBestMatches(jobs, limit = 8) {
     .slice(0, limit);
 }
 
-module.exports = { calculateMatch, getBestMatches, extractSkillsFromText };
+module.exports = { calculateMatch, getBestMatches, extractSkillsFromText, batchCalculateMatches, KNOWN_SKILLS };

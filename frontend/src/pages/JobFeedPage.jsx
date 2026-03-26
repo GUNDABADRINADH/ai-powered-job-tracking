@@ -27,9 +27,9 @@ export default function JobFeedPage() {
  // Initial load with auto location detection
  useEffect(() => {
  const initializeJobFeed = async () => {
- // Only detect location once per session
+ // If already initialized (e.g. navigated here from ResumePage after fetchJobs),
+ // skip re-init so we don't overwrite a fresh resume-based fetch.
  if (locationDetectedRef.current) {
- fetchJobs();
  return;
  }
 
@@ -42,7 +42,8 @@ export default function JobFeedPage() {
  duration: 3,
  });
  locationDetectedRef.current = true;
- // fetchJobs will be triggered by filter change
+ // Triggers manual fetch since filter changes only apply locally
+ fetchJobs();
  return;
  }
 
@@ -78,9 +79,9 @@ export default function JobFeedPage() {
  }
  };
 
- // Debounced filter fetch
+ // Debounced filter fetch (LOCAL FILTERING ONLY)
  useEffect(() => {
- const timer = setTimeout(() => fetchJobs(), 300);
+ const timer = setTimeout(() => useJobStore.getState().applyLocalFilters(), 300);
  return () => clearTimeout(timer);
  }, [filters]);
 
@@ -251,57 +252,6 @@ export default function JobFeedPage() {
  <div className="mt-4">
  <QuickFilterChips />
  </div>
-
- {/* All Active Filters Summary */}
- {(filters.title || filters.skills?.length > 0 || filters.jobType?.length > 0 || filters.workMode?.length > 0 || filters.location || (filters.datePosted && filters.datePosted !== 'anytime') || (filters.matchScore && filters.matchScore !== 'all')) && (
- <motion.div
- initial={{ opacity: 0, y: -10 }}
- animate={{ opacity: 1, y: 0 }}
- className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/40 rounded-lg"
- >
- <div className="flex items-center gap-2 mb-2">
- <Badge className="w-4 h-4 text-blue-600 dark:text-blue-400" />
- <p className="text-xs font-semibold text-blue-900 dark:text-blue-300">Active Filters ({filters.skills?.length || 0 + (filters.title ? 1 : 0) + (filters.jobType?.length || 0) + (filters.workMode?.length || 0) + (filters.location ? 1 : 0) + (filters.datePosted && filters.datePosted !== 'anytime' ? 1 : 0) + (filters.matchScore && filters.matchScore !== 'all' ? 1 : 0)})</p>
- </div>
- <div className="flex flex-wrap gap-1.5">
- {filters.title && (
- <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-white/5 rounded-full text-xs border border-blue-200 dark:border-blue-800/50 text-slate-700 dark:text-slate-300">
- 📝 {filters.title}
- </span>
- )}
- {filters.skills?.map(skill => (
- <span key={skill} className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-white/5 rounded-full text-xs border border-blue-200 dark:border-blue-800/50 text-slate-700 dark:text-slate-300">
- 💼 {skill}
- </span>
- ))}
- {filters.jobType?.map(type => (
- <span key={type} className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-white/5 rounded-full text-xs border border-blue-200 dark:border-blue-800/50 text-slate-700 dark:text-slate-300">
- 🎯 {type}
- </span>
- ))}
- {filters.workMode?.map(mode => (
- <span key={mode} className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-white/5 rounded-full text-xs border border-blue-200 dark:border-blue-800/50 text-slate-700 dark:text-slate-300">
- 🌍 {mode}
- </span>
- ))}
- {filters.location && (
- <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-white/5 rounded-full text-xs border border-blue-200 dark:border-blue-800/50 text-slate-700 dark:text-slate-300">
- 📍 {filters.location}
- </span>
- )}
- {filters.datePosted && filters.datePosted !== 'anytime' && (
- <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-white/5 rounded-full text-xs border border-blue-200 dark:border-blue-800/50 text-slate-700 dark:text-slate-300">
- 📅 {filters.datePosted}
- </span>
- )}
- {filters.matchScore && filters.matchScore !== 'all' && (
- <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white dark:bg-white/5 rounded-full text-xs border border-blue-200 dark:border-blue-800/50 text-slate-700 dark:text-slate-300">
- ⭐ {filters.matchScore}
- </span>
- )}
- </div>
- </motion.div>
- )}
  </div>
 
  <div className="flex gap-6 flex-1 min-h-0 pb-6 relative overflow-hidden">

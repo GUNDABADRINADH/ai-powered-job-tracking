@@ -25,6 +25,7 @@ export const useJobStore = create((set, get) => ({
   filters: { ...DEFAULT_FILTERS },
   currentBatchIndex: 0, // Track which batch we're on
   allJobsCache: [], // Store all jobs to avoid re-fetching
+  filteredCache: [], // Store the jobs after local filters are applied
 
   setFilter: (key, value) =>
     set((state) => ({ filters: { ...state.filters, [key]: value } })),
@@ -79,6 +80,7 @@ export const useJobStore = create((set, get) => ({
 
       set({
         allJobsCache: allJobs,
+        filteredCache: allJobs,
         jobs: allJobs.slice(0, batchSize),
         bestMatches: res.data.bestMatches.slice(0, batchSize),
         total: res.data.total,
@@ -87,40 +89,109 @@ export const useJobStore = create((set, get) => ({
       });
 
       // Auto-load remaining batches
-      setTimeout(() => get().loadNextBatch(), 100);
+      setTimeout(() => get().applyLocalFilters(), 100);
     } catch (err) {
       set({ loading: false, error: err.message || 'Failed to load jobs' });
     }
   },
 
-  loadNextBatch: async () => {
-    const state = get();
-    const { currentBatchIndex, allJobsCache, bestMatches } = state;
+  applyLocalFilters: () => {
+    const { filters, allJobsCache } = get();
+    let result = [...allJobsCache];
     
-    // Don't load more if we're at or past the last batch
-    if (currentBatchIndex >= BATCH_SIZES.length - 1) return;
-
-    const nextIndex = currentBatchIndex + 1;
-    const batchSize = BATCH_SIZES[nextIndex];
+    // Title/Search
+    if (filters.title) {
+      const q = filters.title.toLowerCase();
+      result = result.filter(j => 
+        j.title.toLowerCase().includes(q) || 
+        j.company.toLowerCase().includes(q) || 
+        (j.description || '').toLowerCase().includes(q)
+      );
+    }
     
-    // Calculate how many jobs to show (cumulative)
-    const totalJobsToShow = BATCH_SIZES.slice(0, nextIndex + 1).reduce((a, b) => a + b, 0);
+    // Skills
+    if (filters.skills?.length) {
+      const required = filters.skills.map(s => s.toLowerCase());
+      result = result.filter(j => 
+        required.some(rs => (j.skills || []).some(js => js.toLowerCase().includes(rs)))
+      );
+    }
+    
+    // Date Posted
+    if (filters.datePosted && filters.datePosted !== 'anytime') {
+      const now = new Date();
+      const cutoff = new Date();
+      if (filters.datePosted === '24h') cutoff.setDate(now.getDate() - 1);
+      else if (filters.datePosted === 'week') cutoff.setDate(now.getDate() - 7);
+      else if (filters.datePosted === 'month') cutoff.setMonth(now.getMonth() - 1);
+      result = result.filter(j => new Date(j.postedAt) >= cutoff);
+    }
+    
+    // Job Type
+    if (filters.jobType?.length) {
+      const types = filters.jobType.map(t => t.toLowerCase());
+      result = result.filter(j => types.some(t => (j.jobType || '').toLowerCase().includes(t)));
+    }
+    
+    // Work Mode
+    if (filters.workMode?.length) {
+      const modes = filters.workMode.map(m => m.toLowerCase());
+      result = result.filter(j => modes.some(m => (j.workMode || '').toLowerCase().includes(m)));
+    }
+    
+    // Location
+    if (filters.location) {
+      const locNames = filters.location.split(',').map(l => l.trim().toLowerCase()).filter(Boolean);
+      result = result.filter(j => locNames.some(loc => (j.location || '').toLowerCase().includes(loc)));
+    }
+    
+    // Match Score
+    if (filters.matchScore && filters.matchScore !== 'all') {
+      if (filters.matchScore === 'high') result = result.filter(j => (j.match_score || 0) > 70);
+      else if (filters.matchScore === 'medium') result = result.filter(j => (j.match_score || 0) >= 40 && (j.match_score || 0) <= 70);
+      else if (filters.matchScore === 'low') result = result.filter(j => (j.match_score || 0) < 40);
+    }
+    
+    // Skills Only
+    if (filters.skillsOnly) {
+      result = result.filter(j => (j.match_score || 0) > 0 && (j.matched_skills?.length || 0) > 0);
+    }
 
-    if (totalJobsToShow > allJobsCache.length) return; // No more jobs to load
+    const bestMatches = result
+      .filter(j => (j.match_score || 0) > 70)
+      .sort((a,b) => (b.match_score || 0) - (a.match_score || 0));
 
     set({
+      filteredCache: result,
+      total: result.length,
+      currentBatchIndex: 0,
+      jobs: result.slice(0, BATCH_SIZES[0]),
+      bestMatches: bestMatches.slice(0, BATCH_SIZES[0]),
+    });
+  },
+
+  loadNextBatch: async () => {
+    const state = get();
+    const { currentBatchIndex, filteredCache, bestMatches } = state;
+    
+    const nextIndex = currentBatchIndex + 1;
+    const batchSize = BATCH_SIZES[nextIndex] || 20;
+    
+    const totalJobsToShow = BATCH_SIZES.slice(0, nextIndex + 1).reduce((a, b) => a + b, 0);
+    
+    // Always show up to available jobs, never skip
+    const jobsToShow = Math.min(totalJobsToShow, filteredCache.length);
+    
+    set({
       loadingmore: true,
-      jobs: allJobsCache.slice(0, totalJobsToShow),
-      bestMatches: bestMatches, // Keep same best matches
+      jobs: filteredCache.slice(0, jobsToShow),
+      bestMatches: bestMatches.slice(0, jobsToShow),
       currentBatchIndex: nextIndex,
     });
-
-    // Auto-load next batch after a delay
-    if (nextIndex < BATCH_SIZES.length - 1) {
-      setTimeout(() => get().loadNextBatch(), 800);
-    } else {
+    
+    setTimeout(() => {
       set({ loadingmore: false });
-    }
+    }, 500);
   },
 
   loadMoreManual: async () => {

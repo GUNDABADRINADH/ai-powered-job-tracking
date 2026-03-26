@@ -54,11 +54,9 @@ export default function ResumePage() {
  };
 
  const handleBrowseJobs = async () => {
- // Pre-populate skills filter if available
- if (uploadedData?.skills && uploadedData.skills.length > 0) {
- setFilters({ skills: uploadedData.skills });
+ // Always set skills filter (even if empty array) and fetch with new resume context
+ setFilters({ skills: uploadedData?.skills || [] });
  await fetchJobs();
- }
  navigate('/jobs');
  };
 
